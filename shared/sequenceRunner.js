@@ -10,8 +10,11 @@ async function loadIframe(url, target) {
 }
 
 export async function runSequence(urls) {
+  const main = document.querySelector("main");
+
   const sketches = [];
   let currentSketchId = -1;
+
   const debug = document.querySelector(".debug");
   let params = new URLSearchParams(document.location.search);
   if (params.has("debug")) {
@@ -41,6 +44,7 @@ export async function runSequence(urls) {
     const newSketch = sketches[currentSketchId];
     if (newSketch) {
       newSketch.iframe.style = "z-index:99;";
+      debug.innerHTML = new URL(newSketch.iframe.src).pathname;
     }
   }
 

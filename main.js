@@ -11,7 +11,7 @@ const exampleSequence = [
   "sketches/example-sequence-3",
 ];
 
-//runSequence(exampleSequence);
+runSequence(exampleSequence);
 
 const exampleSequenceObject = [
   {
@@ -40,4 +40,4 @@ const exampleSequenceObject = [
   },
 ];
 
-runRandomSequence(exampleSequenceObject);
+//unRandomSequence(exampleSequenceObject);
