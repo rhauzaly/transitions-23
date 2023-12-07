@@ -1,8 +1,8 @@
 import { runSequence, runRandomSequence } from "./shared/sequenceRunner.js";
 
 const emptySequence = [
-  "sketches/example-sequence-empty",
-  "sketches/example-sequence-empty",
+  "sketches/example-sequence-empty-1",
+  "sketches/example-sequence-empty-2",
 ];
 
 const exampleSequence = [

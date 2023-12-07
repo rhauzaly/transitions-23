@@ -12,9 +12,12 @@ async function loadIframe(url, target) {
 export async function runSequence(urls) {
   const sketches = [];
   let currentSketchId = -1;
-
-  const main = document.querySelector("main");
-  main.style.visibility = "hidden";
+  const debug = document.querySelector(".debug");
+  let params = new URLSearchParams(document.location.search);
+  if (params.has("debug")) {
+    debug.style.display = "block";
+  }
+  console.log(params);
 
   for (const url of urls) {
     sketches.push({
