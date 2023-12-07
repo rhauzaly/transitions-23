@@ -1,8 +1,8 @@
 import { runSequence } from "./shared/sequenceRunner.js";
 
 const emptySequence = [
-    "sketches/example-sequence-empty",
-    "sketches/example-sequence-empty",
+    "sketches/example-sequence-empty-1",
+    "sketches/example-sequence-empty-2",
 ]
 
 const exampleSequence = [
@@ -11,4 +11,4 @@ const exampleSequence = [
     "sketches/example-sequence-3"
 ]
 
-runSequence(exampleSequence)
+runSequence(emptySequence)
