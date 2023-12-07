@@ -1,74 +1,238 @@
-
 async function loadIframe(url, target) {
-
-    return new Promise((resolve, reject) => {
-
-        const iframe = document.createElement("iframe")
-        iframe.src = url
-        iframe.addEventListener("load", ev => {
-
-            resolve(iframe)
-        })
-        target.appendChild(iframe)
-    })
+  return new Promise((resolve, reject) => {
+    const iframe = document.createElement("iframe");
+    iframe.src = url;
+    iframe.addEventListener("load", (ev) => {
+      resolve(iframe);
+    });
+    target.appendChild(iframe);
+  });
 }
 
 export async function runSequence(urls) {
+  const sketches = [];
+  let currentSketchId = -1;
 
-    const sketches = []
-    let currentSketchId = -1
+  const main = document.querySelector("main");
+  main.style.visibility = "hidden";
 
-    const main = document.querySelector("main")
-    main.style.visibility = "hidden"
-    for (const url of urls) {
+  for (const url of urls) {
+    sketches.push({
+      url: url,
+      iframe: await loadIframe(url, main),
+    });
+  }
 
-        sketches.push({
-            url: url,
-            iframe: await loadIframe(url, main)
-        })
+  setSketch(0);
+  main.style.visibility = "visible";
+
+  function setSketch(id) {
+    const prev = sketches[currentSketchId];
+    if (prev) {
+      prev.iframe.style = "z-index:-99";
+      prev.iframe.src = prev.iframe.src;
     }
 
+    currentSketchId = id;
 
-    setSketch(0)
-    main.style.visibility = "visible"
+    const newSketch = sketches[currentSketchId];
+    if (newSketch) {
+      newSketch.iframe.style = "z-index:99;";
+    }
+  }
 
+  function next() {
+    const nextId = (currentSketchId + 1) % sketches.length;
+    setSketch(nextId);
+  }
 
-    function setSketch(id) {
+  window.addEventListener(
+    "message",
+    (event) => {
+      if (event.data === "finished") {
+        console.log("received message to move to next sketch");
+        next();
+      }
+    },
+    false
+  );
+}
 
-        const prev = sketches[currentSketchId]
-        if (prev) {
-            prev.iframe.style = "z-index:-99"
-            prev.iframe.src = prev.iframe.src;
-        }
+export async function runRandomSequence(urls) {
+  let currentSequence = 0;
+  let currentStudent = "random";
 
-        currentSketchId = id
+  const main = document.querySelector("main");
+  main.style.visibility = "visible";
 
-        const newSketch = sketches[currentSketchId]
-        if (newSketch) {
-            newSketch.iframe.style = "z-index:99;"
-        }
+  const studentName = document.getElementById("studentName");
+  const index = document.getElementById("index");
+  const menu = document.getElementById("menu");
+  const close = document.getElementById("close-menu");
+
+  // on index click toggle menu div visibility
+  index.addEventListener("click", () => {
+    menu.classList.toggle("hidden");
+  });
+
+  // on li with class student click filter the sequence
+  menu.addEventListener("click", (e) => {
+    if (e.target.classList.contains("student")) {
+      let filteredStudent = e.target.getAttribute("student-name");
+
+      menu.classList.toggle("hidden");
+      currentStudent = filteredStudent;
+
+      // if current student highlight the li
+      document
+        .querySelectorAll(".student")
+        .forEach((link) =>
+          link.classList.toggle(
+            "selected",
+            link.getAttribute("student-name") === currentStudent
+          )
+        );
+      nextSequence();
+    }
+  });
+
+  close.addEventListener("click", () => {
+    menu.classList.toggle("hidden");
+  });
+
+  // Fill menu
+  const studentNames = urls
+    .map((item) => item.student)
+    .filter((value, index, self) => self.indexOf(value) === index);
+  const liElements = studentNames.map(
+    (name) => `<li class="student link" student-name="${name}">${name}</li>`
+  );
+  const ulInnerHTML = liElements.join("");
+
+  // get div with id inside menu div
+  const studentList = document.getElementById("studentList");
+  studentList.innerHTML = `<ul><li class="student link selected" student-name="random">Random</li>${ulInnerHTML}</ul>`;
+
+  // Load the first iframe at beginning
+  const first = {
+    url: urls[0].url,
+    iframe: await loadIframe(urls[currentSequence].url, main),
+  };
+
+  if (first) {
+    first.iframe.style = "z-index:99";
+    first.iframe.src = first.iframe.src;
+  }
+
+  let transition;
+
+  // First
+  setNext(urls[0]);
+
+  async function setNext(nextSketch) {
+    const next = {
+      url: nextSketch.url,
+      iframe: await loadIframe(nextSketch.url, main),
+    };
+
+    //set timeout to fade out studentName
+    clearTimeout(transition);
+
+    transition = setTimeout(() => {
+      studentName.style.opacity = "0";
+    }, 3000);
+
+    // only show student name if currentStudent is random
+    if (nextSketch.student && currentStudent == "random") {
+      studentName.innerHTML = nextSketch.student;
+      studentName.style.opacity = "1";
+    } else {
+      studentName.innerHTML = "";
+      studentName.style.opacity = "0";
     }
 
-    function next() {
+    // set index number
+    let sequencesToUse =
+      currentStudent === "random"
+        ? urls
+        : urls.filter((seq) => seq.student === currentStudent);
 
-        const nextId = (currentSketchId + 1) % sketches.length
-        setSketch(nextId)
+    const currentSequenceObject = urls[currentSequence];
+    const currentSequenceIndex = sequencesToUse.findIndex(
+      (seq) => seq === currentSequenceObject
+    );
+
+    index.innerHTML = `<div class="link">${currentSequenceIndex + 1}/${
+      sequencesToUse.length
+    }</div>`;
+
+    if (next) {
+      next.iframe.style = "z-index:-99";
+      next.iframe.src = next.iframe.src;
     }
+  }
 
-    window.addEventListener("message", (event) => {
+  function nextSequence() {
+    const nextSequence = selectNextSequence(
+      urls[currentSequence].end,
+      urls,
+      currentStudent
+    );
+    currentSequence = nextSequence;
+    setNext(urls[nextSequence]);
 
-        if (event.data === "finished") {
-            console.log("received message to move to next sketch")
-            next()
-        }
-    }, false)
+    // remove first iframe on main
+    main.removeChild(main.querySelector("iframe"));
+    main.querySelector("iframe").style = "z-index:99";
+  }
+
+  window.addEventListener(
+    "message",
+    async (event) => {
+      if (event.data === "finished") {
+        // toggle the iframes
+        // main.removeChild(main.querySelector("iframe")); // Remove the first iframe
+        // main.querySelector("iframe").style = "z-index:99";
+
+        nextSequence();
+      }
+    },
+    false
+  );
+}
+
+function selectNextSequence(endShape, urls, currentStudent) {
+  const matchingSequences = urls
+    .map((seq, index) => ({ seq, index })) // Map each sequence to an object with the sequence and its index
+    .filter(({ seq }) => {
+      // Filter based on the endShape and, if currentStudent is provided, also filter by student name
+      return (
+        seq.begin === endShape &&
+        (currentStudent === "random" || seq.student === currentStudent)
+      );
+    });
+
+  if (matchingSequences.length > 0) {
+    const randomIndex = Math.floor(Math.random() * matchingSequences.length);
+    return matchingSequences[randomIndex].index; // Return the index of the selected sequence
+  } else if (currentStudent !== "random") {
+    // If no match is found and currentStudent is provided, try to find the first sequence for the currentStudent
+    const studentSequences = urls
+      .map((seq, index) => ({ seq, index }))
+      .filter(({ seq }) => seq.student === currentStudent);
+
+    if (studentSequences.length > 0) {
+      return studentSequences[0].index;
+    }
+  }
+
+  return 0; // Return 0 if no matching sequence is found
 }
 
 /**
  * This tells the sequence runner (which has the sketch loaded as an iframe) that this sketch is finished. The next sketch will be activated.
  */
 export function sendSequenceNextSignal() {
-
-    console.log("sketch finished, starting the next one.")
-    window.parent.postMessage("finished", "*")
+  console.log("sketch finished, starting the next one.");
+  window.parent.postMessage("finished", "*");
 }

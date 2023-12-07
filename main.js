@@ -1,14 +1,43 @@
-import { runSequence } from "./shared/sequenceRunner.js";
+import { runSequence, runRandomSequence } from "./shared/sequenceRunner.js";
 
 const emptySequence = [
-    "sketches/example-sequence-empty",
-    "sketches/example-sequence-empty",
-]
+  "sketches/example-sequence-empty",
+  "sketches/example-sequence-empty",
+];
 
 const exampleSequence = [
-    "sketches/example-sequence-1",
-    "sketches/example-sequence-2",
-    "sketches/example-sequence-3"
-]
+  "sketches/example-sequence-1",
+  "sketches/example-sequence-2",
+  "sketches/example-sequence-3",
+];
 
-runSequence(exampleSequence)
+//runSequence(exampleSequence);
+
+const exampleSequenceObject = [
+  {
+    url: "sketches/example-sequence-empty",
+    begin: "square",
+    end: "cross",
+    student: "Teo Grajqevci",
+  },
+  {
+    url: "sketches/example-sequence-empty",
+    begin: "cross",
+    end: "grid",
+    student: "Rosalie Girard",
+  },
+  {
+    url: "sketches/example-sequence-empty",
+    begin: "circle",
+    end: "square",
+    student: "Laurine Gigandet",
+  },
+  {
+    url: "sketches/example-sequence-empty",
+    begin: "cross",
+    end: "square",
+    student: "Andreas Abbaszadeh",
+  },
+];
+
+runRandomSequence(exampleSequenceObject);
