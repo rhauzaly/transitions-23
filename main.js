@@ -1,22 +1,24 @@
-import { runSequence, runRandomSequence, loadSequenceMetadata } from "./shared/sequenceRunner.js";
+import {
+  runSequence,
+  runRandomSequence,
+  loadSequenceMetadata,
+} from "./shared/sequenceRunner.js";
 
 const emptySequence = [
-    "sketches/example-sequence-empty-1",
-    "sketches/example-sequence-empty-2",
+  "sketches/example-sequence-empty-1",
+  "sketches/example-sequence-empty-2",
 ];
 
 const exampleSequence = [
-    "sketches/example-sequence-1",
-    "sketches/example-sequence-2",
-    "sketches/example-sequence-3",
+  "sketches/example-sequence-1",
+  "sketches/example-sequence-2",
+  "sketches/example-sequence-3",
 ];
 
-loadSequenceMetadata(exampleSequence).then(sequenceData => {
-    console.log(sequenceData)
-    runRandomSequence(sequenceData)
-})
-
-
+loadSequenceMetadata(exampleSequence).then((sequenceData) => {
+  console.log(sequenceData);
+  runRandomSequence(sequenceData);
+});
 
 // const exampleSequenceObject = [
 //     {
