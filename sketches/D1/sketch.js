@@ -16,7 +16,7 @@ window.preload = function () {
   soundFormats("mp3");
   mySound = loadSound("sounds/roue2.mp3");
   mySound2 = loadSound("sounds/xilo.mp3");
-  mySound3 = loadSound("sounds/violon2.mp3");
+  mySound3 = loadSound("sounds/reverse.mp3");
 };
 class Particle {
   constructor(x, y, endSize) {
