@@ -1,5 +1,1 @@
-{
-  "begin": "square",
-  "end": "circle",
-  "student": "Your Name"
-}
+{ "begin": "grid", "end": "square", "student": "Rosalie" }
