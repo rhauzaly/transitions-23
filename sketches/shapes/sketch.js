@@ -40,11 +40,10 @@ window.draw = function () {
       circle(centerX, centerY, objSize);
       break;
 
-    case 2:
-      fill(0);
-      noStroke();
-      const gridCount = 5;
-      const pointSize = strokeW;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const objSize = sceneSize / 2;
+      const strokeW = objSize / 20;
 
       for (let x = 0; x < gridCount; x++) {
         for (let y = 0; y < gridCount; y++) {
