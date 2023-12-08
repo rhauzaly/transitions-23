@@ -169,9 +169,8 @@ export async function runRandomSequence(urls) {
       (seq) => seq === currentSequenceObject
     );
 
-    index.innerHTML = `<div class="link">${currentSequenceIndex + 1}/${
-      sequencesToUse.length
-    }</div>`;
+    index.innerHTML = `<div class="link">${currentSequenceIndex + 1}/${sequencesToUse.length
+      }</div>`;
 
     if (next) {
       next.iframe.style = "z-index:-99";
@@ -242,4 +241,29 @@ function selectNextSequence(endShape, urls, currentStudent) {
 export function sendSequenceNextSignal() {
   console.log("sketch finished, starting the next one.");
   window.parent.postMessage("finished", "*");
+}
+
+
+
+export async function loadSequenceMetadata(urls) {
+
+  let sequenceData = await Promise.all(urls.map(async url => {
+
+    const infoUrl = url + "/info.json"
+    try {
+
+      const response = await fetch(infoUrl)
+      const data = await response.json()
+      return Object.assign({},
+        {
+          url: url
+        }, data)
+    }
+    catch (e) {
+
+    }
+  }))
+  sequenceData = sequenceData.filter(o => o !== undefined)
+
+  return sequenceData
 }
